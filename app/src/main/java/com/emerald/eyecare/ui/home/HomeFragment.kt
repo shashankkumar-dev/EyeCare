@@ -1,6 +1,7 @@
 package com.emerald.eyecare.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,35 +9,36 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.emerald.eyecare.databinding.FragmentHomeBinding
+import com.emerald.eyecare.service.AlarmService
+import com.emerald.eyecare.utils.Constant
 
 class HomeFragment : Fragment() {
 
-    private var _binding: FragmentHomeBinding? = null
+    private lateinit var binding: FragmentHomeBinding
+    private lateinit var viewModel: HomeViewModel
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
-
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
-        return root
+        viewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        setText()
+        setButtonClickListener()
+        return binding.root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun setButtonClickListener() {
+        binding.button.setOnClickListener {
+            Log.i(Constant.TAG, "setButtonClickListener: ")
+            AlarmService.checkPermission(requireContext())
+        }
+    }
+
+    private fun setText() {
+        // useless function
+        val root: View = binding.root
+        val textView: TextView = binding.textHome
+        viewModel.text.observe(viewLifecycleOwner) {
+            textView.text = it
+        }
     }
 }
